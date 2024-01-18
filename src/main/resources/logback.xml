@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <springProperty scope="context" name="APP_NAME" source="spring.application.name"/>
+    <property name="app.name" value="${APP_NAME}"/>
+    <Property name="log.location" value="./logs"/>
+    <property name="log.pattern" value="[%d{yyyy-MM-dd HH:mm:ss.SSS}][${HOSTNAME}][${app.name}][%p][%t][%c{1}] - [%X{x-trace-id}] - %m%n"/>
+    <property name="charset" value="UTF-8"/>
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <charset>${charset}</charset>
+            <pattern>${log.pattern}</pattern>
+        </encoder>
+    </appender>
+    <appender name="asyncConsole" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="console"/>
+    </appender>
+    <springProfile name="local,local-5f">
+        <logger name="org.hibernate.SQL" level="DEBUG" additivity="false">
+            <appender-ref ref="asyncConsole"/>
+        </logger>
+        <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE" additivity="false">
+            <appender-ref ref="asyncConsole"/>
+        </logger>
+    </springProfile>
+    <root level="INFO">
+        <appender-ref ref="asyncConsole"/>
+    </root>
+</configuration>
